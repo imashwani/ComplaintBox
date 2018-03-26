@@ -3,6 +3,7 @@ package com.example.ashwani.complaintbox;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -15,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tv = findViewById(R.id.hello);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -24,16 +24,20 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.settings:
-                        tv.setText("settings");
+                        Toast.makeText(MainActivity.this, "settigns", Toast.LENGTH_SHORT).show();
                         break;
 
                     case R.id.home:
-                        tv.setText("Home");
-                        Toast.makeText(MainActivity.this, "home clicked", Toast.LENGTH_SHORT).show();
+
+                        Toast.makeText(MainActivity.this, "home", Toast.LENGTH_SHORT).show();
+
                         break;
                     case R.id.complaint:
-                        tv.setText("complaint");
-                        Toast.makeText(MainActivity.this, "complaint clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Complaint", Toast.LENGTH_SHORT).show();
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        ComplaintRVListFragment fragment = new ComplaintRVListFragment();
+                        transaction.replace(R.id.frame_layout, fragment);
+                        transaction.commit();
                         break;
 
                 }
