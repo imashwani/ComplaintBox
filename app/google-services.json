@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "1033499463135",
+    "firebase_url": "https://pranycomputers.firebaseio.com",
+    "project_id": "pranycomputers",
+    "storage_bucket": "pranycomputers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033499463135:android:4c4ef0772be2ab50",
+        "android_client_info": {
+          "package_name": "com.example.android.pranaycomp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033499463135-g2jm4m7sgt62sqpape8221p93tvl0inq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.pranaycomp",
+            "certificate_hash": "5a69137c1e0f02cf6c1256c0a5752ec6c8cf508f"
+          }
+        },
+        {
+          "client_id": "1033499463135-852ljhpvvqjsr0ll2dehhmlruvctmip9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.pranaycomp",
+            "certificate_hash": "bbd02dcd4dc46f758aff4e953996a2713c244c7c"
+          }
+        },
+        {
+          "client_id": "1033499463135-o602f4ag2sbkoimecc1sn36v0vjke1fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcjAFZ04besH3LjSJOhcnpYKMwmbNx78c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033499463135-o602f4ag2sbkoimecc1sn36v0vjke1fm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033499463135:android:5f703f564296767a",
+        "android_client_info": {
+          "package_name": "com.example.ashwani.complaintbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033499463135-slvoeot5v7rk0goh78fp3pfr9hus8fhl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ashwani.complaintbox",
+            "certificate_hash": "5a69137c1e0f02cf6c1256c0a5752ec6c8cf508f"
+          }
+        },
+        {
+          "client_id": "1033499463135-o602f4ag2sbkoimecc1sn36v0vjke1fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcjAFZ04besH3LjSJOhcnpYKMwmbNx78c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033499463135-o602f4ag2sbkoimecc1sn36v0vjke1fm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
