@@ -5,15 +5,16 @@ package com.example.ashwani.complaintbox;
  */
 
 public class Complaint {
-    String ComplaintNo, UserId, SchoolName, Description, Date, Problems, PhoneNumber, EmailId, Status;
-
-    public Complaint(String complaintNo, String userId, String schoolName, String description, String date, String problems, String phoneNumber, String emailId, String status) {
+    private String ComplaintNo, UserId, SchoolName, Description, Date, Problems,ImageLink, PhoneNumber, EmailId, Status;
+    public Complaint(){}
+    public Complaint(String complaintNo, String userId, String schoolName, String description, String date, String problems, String imageLink, String phoneNumber, String emailId, String status) {
         ComplaintNo = complaintNo;
         UserId = userId;
         SchoolName = schoolName;
         Description = description;
         Date = date;
         Problems = problems;
+        ImageLink = imageLink;
         PhoneNumber = phoneNumber;
         EmailId = emailId;
         Status = status;
@@ -65,6 +66,14 @@ public class Complaint {
 
     public void setProblems(String problems) {
         Problems = problems;
+    }
+
+    public String getImageLink() {
+        return ImageLink;
+    }
+
+    public void setImageLink(String imageLink) {
+        ImageLink = imageLink;
     }
 
     public String getPhoneNumber() {
