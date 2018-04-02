@@ -16,6 +16,7 @@
 
 
         <ImageView
+            android:layout_margin="8dp"
                 android:id="@+id/school_icon_imgview"
                 android:layout_width="120dp"
                 android:layout_height="120dp" />

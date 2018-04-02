@@ -17,6 +17,7 @@ public class ComplaintAdapter extends RecyclerView.Adapter<ComplaintAdapter.Comp
     ArrayList<Complaint> ComplaintList;
     Context context;
 
+
     public ComplaintAdapter(Context context, ArrayList<Complaint> complaintList) {
         this.context = context;
         ComplaintList = complaintList;
@@ -55,4 +56,5 @@ public class ComplaintAdapter extends RecyclerView.Adapter<ComplaintAdapter.Comp
         }
 
     }
+
 }

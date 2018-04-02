@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.ashwani.complaintbox.Complaint;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -19,7 +20,7 @@ import static android.content.ContentValues.TAG;
 
 public class ComplaintViewModel extends ViewModel {
     private static final DatabaseReference COMPLAINT_REF =
-            FirebaseDatabase.getInstance().getReference("/complaint");
+            FirebaseDatabase.getInstance().getReference("/complaint").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
     private final FirebaseQueryLiveData liveData = new FirebaseQueryLiveData(COMPLAINT_REF);
 

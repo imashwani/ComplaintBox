@@ -14,4 +14,16 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="image_home">
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <style name="cradview_home">
+        <item name="android:layout_height">180dp</item>
+        <item name="android:layout_width">140dp</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:clickable">true</item>
+
+    </style>
 </resources>

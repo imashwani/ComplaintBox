@@ -3,11 +3,7 @@ package com.example.ashwani.complaintbox;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.example.ashwani.complaintbox.ViewModel.ComplaintViewModel;
 
@@ -33,6 +28,7 @@ public class ComplaintRVListFragment extends Fragment {
     View rootView;
     ProgressBar progressBar;
     ArrayList<Complaint> compList;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,11 +37,11 @@ public class ComplaintRVListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView:"+" fragment crated bro");
+        Log.d(TAG, "onCreateView:" + " fragment crated bro");
         // Inflate the layout for this fragment
-         rootView = inflater.inflate(R.layout.fragment_complaint_rvlist, container, false);
-         progressBar=rootView.findViewById(R.id.progressBar);
-         startLoading();
+        rootView = inflater.inflate(R.layout.fragment_complaint_rvlist, container, false);
+        progressBar = rootView.findViewById(R.id.progressBar);
+        startLoading();
 
         return rootView;
     }
@@ -54,7 +50,7 @@ public class ComplaintRVListFragment extends Fragment {
         mRecyclerView = rootView.findViewById(R.id.recycler_view_complaint);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        compList=new ArrayList<>();
+        compList = new ArrayList<>();
         compList = getArrayList();
 
         mComplaintAdapter = new ComplaintAdapter(getActivity(), compList);
@@ -85,12 +81,12 @@ public class ComplaintRVListFragment extends Fragment {
                 }
                 mComplaintAdapter = new ComplaintAdapter(getActivity(), compList);
                 mRecyclerView.setAdapter(mComplaintAdapter);
-                if(progressBar.getVisibility()==View.VISIBLE)
-                progressBar.setVisibility(View.GONE);
+                if (progressBar.getVisibility() == View.VISIBLE)
+                    progressBar.setVisibility(View.GONE);
             }
         });
 
         return arrayList;
     }
-    
+
 }

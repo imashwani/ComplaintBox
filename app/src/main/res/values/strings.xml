@@ -3,4 +3,25 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="facebook_app_id">2004244946504324</string>
+    <string name="fb_login_protocol_scheme">fb2004244946504324</string>
+
+    <string name="cancel">cancel</string>
+    <string name="cannotopencamera">Can\'t open the camera</string>
+    <string-array name="Schools">
+        <item>APS DK</item>
+        <item>Happy Montesory</item>
+        <item>DAV</item>
+        <item>PALAm wla school</item>
+    </string-array>
+
+    <string-array name="Problem">
+        <item>Projector</item>
+        <item>Wireing</item>
+        <item>Sound</item>
+        <item>Other..(please specify in discription)</item>
+    </string-array>
+
 </resources>

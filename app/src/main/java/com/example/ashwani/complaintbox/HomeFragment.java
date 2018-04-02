@@ -1,42 +1,28 @@
 package com.example.ashwani.complaintbox;
 
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment {
     FirebaseDatabase database;
     DatabaseReference myReff;
-    Button bt;
+    CardView viewComplaintCV, newComplaintCV, iCardServiceCV, feedbackCV;
+    FragmentTransaction transaction;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        database = FirebaseDatabase.getInstance();
-        myReff = database.getReference().child("complaint");
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
     }
 
@@ -45,38 +31,82 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         // Inflate the layout for this fragment
-        bt = rootView.findViewById(R.id.complaint_button);
-        final TextView tv=rootView.findViewById(R.id.hello);
-        DatabaseReference db=database.getReference().child("con");
-        db.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String sp=dataSnapshot.getValue(String.class);
-                tv.setText(sp);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        //getting reference to the card view items
+        viewComplaintCV = rootView.findViewById(R.id.viewComplaintCardView_home);
+        newComplaintCV = rootView.findViewById(R.id.addNewComplaintCV_home);
+        iCardServiceCV = rootView.findViewById(R.id.iCard_cardView_home);
+        feedbackCV = rootView.findViewById(R.id.feedbackCV_home);
 
+        //setting on click events on the items in home fragment
+        viewComplaintCV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openComplaintRVList();
             }
         });
-        bt.setOnClickListener(new View.OnClickListener() {
+        newComplaintCV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addNewComplaintFragment();
+            }
+        });
+        //todo: crate a icard service fragments with all the details and form to send query;
+        iCardServiceCV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Log.d(TAG, "onClick: reff\n\n" + myReff);
 
-                Complaint cp = new Complaint("001", "sds5s", "apsdk", "desp", "12/12/17", "cpu ka problem", "link ka img", "9911416637", "mail@gmail.com", "true");
+            }
+        });
+        feedbackCV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openPlayStore();
+            }
+        });
+
+
+        return rootView;
+    }
+
+    private void openPlayStore() {
+        final String appPackageName = getActivity().getPackageName(); // getPackageName() from Context or Activity object
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+    private void addNewComplaintFragment() {
+        transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        RegisterComplaintFragment fragment = new RegisterComplaintFragment();
+        transaction.add(R.id.frame_layout, fragment);
+        transaction.commit();
+    }
+
+    private void openComplaintRVList() {
+        transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        ComplaintRVListFragment fragment = new ComplaintRVListFragment();
+        transaction.replace(R.id.frame_layout, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+
+}
+
+
+/*        bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cp = new Complaint("002", "sds5s", "shakar dk", "desp", "12/12/17", "cpu ka problem", "link ka img", "9911416637", "mail@gmail.com", "true");
                 myReff.push().setValue(cp);
 
-                cp = new Complaint("002", "sds5s", "shakar dk", "desp", "12/12/17", "cpu ka problem", "link ka img", "9911416637", "mail@gmail.com", "true");
-//                myReff.setValue("data aaya");
-
+                addNewComplaintFragment();
 
             }
 
         });
-        return rootView;
-    }
-
-}
+*/
