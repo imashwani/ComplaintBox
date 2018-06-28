@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,16 +29,15 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -47,15 +45,16 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
 public class RegisterComplaintFragment extends Fragment {
-    int IMAGE_GALLERY_REQUEST = 20;
+
     int CAMERA_PERMISSION_REQUEST_CODE = 4192;
     Button camera, gallery;
     String mCurrentPhotoPath;
-    FirebaseDatabase database;
     Bitmap bitmap;
+    FirebaseDatabase database;
     DatabaseReference myReff;
-    int CAMERA_PIC_REQUEST = 8, SELECT_IMAGE = 4;
-    String complaintNo = "02", userId = "", schoolName = "", description = "", date = "", problems = "", imageLink = "", phoneNumber = "", emailId = "", status = "";
+    int CAMERA_PIC_REQUEST = 8, IMAGE_GALLERY_REQUEST = 20;
+    String complaintNo = "02", userId = "", schoolName = "", description = "", date = "",
+            problems = "", imageLink = "", phoneNumber = "", emailId = "", status = "";
     private ImageView imgPicture;
     private View rootView;
     private Button sendComplaint;
@@ -68,8 +67,11 @@ public class RegisterComplaintFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_register_complaint, container, false);
-        database = FirebaseDatabase.getInstance();
-        myReff = database.getReference("complaint");
+//        database = FirebaseDatabase.getInstance();
+//        myReff = database.getReference("complaint");
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
 
         spinner = (Spinner) rootView.findViewById(R.id.school_spinner);
 // Create an ArrayAdapter using the string array and a default spinner layout
@@ -88,7 +90,17 @@ public class RegisterComplaintFragment extends Fragment {
             public void onClick(View view) {
                 getComplaintDetails();
                 Complaint theComplaint = new Complaint(complaintNo, userId, schoolName, description, date, problems, imageLink, phoneNumber, emailId, status);
-                myReff.child(getUserId()).push().setValue(theComplaint);
+                //pushing complaint details to the database
+//                myReff.child(getUserId()).push().setValue(theComplaint);
+                Intent registerComplaintServiceIntent = new Intent();
+                registerComplaintServiceIntent.setClass(getContext(), RegisterComplaintService.class);
+
+                registerComplaintServiceIntent.putExtra("complaint", theComplaint);
+                if (mCurrentPhotoPath.length() > 0) {
+                    registerComplaintServiceIntent.putExtra("filePath", mCurrentPhotoPath);
+                }
+
+                getContext().startService(registerComplaintServiceIntent);
             }
         });
         mImageAddButton.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +122,8 @@ public class RegisterComplaintFragment extends Fragment {
                         dialog.dismiss();
                         // Do something
                         if (which == 0) {
-                            Toast.makeText(getActivity(), "Camera se loge", Toast.LENGTH_SHORT).show();
+                            //camera option selected
+                            Toast.makeText(getActivity(), "Camera started", Toast.LENGTH_SHORT).show();
                             if (getActivity().checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && getActivity().checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                                 invokeCamera();
                             } else {
@@ -121,7 +134,7 @@ public class RegisterComplaintFragment extends Fragment {
 
                         }
                         if (which == 1) {
-                            Toast.makeText(getActivity(), "Gallery ke dhikhaoge", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "Showing Gallery ", Toast.LENGTH_SHORT).show();
                             onImageGalleryClicked();
                         }
                     }
@@ -137,21 +150,21 @@ public class RegisterComplaintFragment extends Fragment {
     }
 
     private String getUserId() {
-        mFirebaseAuth = FirebaseAuth.getInstance();
         return mFirebaseAuth.getCurrentUser().getUid();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == 5) {
-                new CompressFilesTask().execute(mCurrentPhotoPath);
+            if (requestCode == CAMERA_PIC_REQUEST) {
+//                new CompressFilesTask().execute(mCurrentPhotoPath);
+                Log.d(TAG, "onActivityResult: camera image current Path " + mCurrentPhotoPath);
 
                 File imgFile = new File(mCurrentPhotoPath);
                 if (imgFile.exists()) {
                     Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                     ImageView myImage = rootView.findViewById(R.id.image_registerComp);
-                    myImage.setImageBitmap(myBitmap);
+                    Glide.with(getContext()).load(myBitmap).into(myImage);
                 }
             }
             // if we are here, everything processed successfully.
@@ -160,6 +173,10 @@ public class RegisterComplaintFragment extends Fragment {
 
                 // the address of the image on the SD Card.
                 Uri imageUri = data.getData();
+                mCurrentPhotoPath = imageUri.getPath().toString();
+
+                Log.d(TAG, "onActivityResult: galley image current Path " + mCurrentPhotoPath);
+
 
                 // declare a stream to read the image data from the SD Card.
                 InputStream inputStream;
@@ -174,8 +191,7 @@ public class RegisterComplaintFragment extends Fragment {
 
                     // show the image to the user
                     ImageView myImage = rootView.findViewById(R.id.image_registerComp);
-                    myImage.setImageBitmap(image);
-
+                    Glide.with(getContext()).load(image).into(myImage);
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -220,7 +236,8 @@ public class RegisterComplaintFragment extends Fragment {
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
-                startActivityForResult(takePictureIntent, 5);
+                startActivityForResult(takePictureIntent, CAMERA_PIC_REQUEST
+                );
             }
         }
     }
@@ -282,35 +299,35 @@ public class RegisterComplaintFragment extends Fragment {
         emailId = mFirebaseAuth.getCurrentUser().getEmail();
     }
 
-    private class CompressFilesTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-            Bitmap bp = BitmapFactory.decodeFile(mCurrentPhotoPath);
-            OutputStream file = null;
-            try {
-                file = new FileOutputStream(mCurrentPhotoPath);
-
-                if (file != null) {
-                    bp.compress(Bitmap.CompressFormat.WEBP, 50, file);
-                    file.close();
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return mCurrentPhotoPath;
-        }
-
-        @Override
-        protected void onPostExecute(String imgFile) {
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile);
-            ImageView myImage = rootView.findViewById(R.id.image_registerComp);
-            myImage.setImageBitmap(myBitmap);
-            Toast.makeText(getActivity(), "Compressed Bro", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    private class CompressFilesTask extends AsyncTask<String, Void, String> {
+//
+//        @Override
+//        protected String doInBackground(String... strings) {
+//            Bitmap bp = BitmapFactory.decodeFile(mCurrentPhotoPath);
+//            OutputStream file = null;
+//            try {
+//                file = new FileOutputStream(mCurrentPhotoPath);
+//
+//                if (file != null) {
+//                    bp.compress(Bitmap.CompressFormat.WEBP, 50, file);
+//                    file.close();
+//                }
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            return mCurrentPhotoPath;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String imgFile) {
+//            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile);
+//            ImageView myImage = rootView.findViewById(R.id.image_registerComp);
+//            Glide.with(getContext()).load(myBitmap).into(myImage);
+//            Toast.makeText(getActivity(), "Compressed Bro", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
 
 }

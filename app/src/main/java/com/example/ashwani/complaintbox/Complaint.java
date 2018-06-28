@@ -1,10 +1,13 @@
 package com.example.ashwani.complaintbox;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Ashwani on 26/03/2018.
  */
 
-public class Complaint {
+public class Complaint implements Parcelable {
     private String complaintNo, userId, schoolName, description, date, problems, imageLink, phoneNumber, emailId, status;
 
     public Complaint() {
@@ -21,6 +24,44 @@ public class Complaint {
         this.phoneNumber = phoneNumber;
         this.emailId = emailId;
         this.status = status;
+    }
+
+    public static final Creator<Complaint> CREATOR = new Creator<Complaint>() {
+        @Override
+        public Complaint createFromParcel(Parcel in) {
+            return new Complaint(in);
+        }
+
+        @Override
+        public Complaint[] newArray(int size) {
+            return new Complaint[size];
+        }
+    };
+
+    protected Complaint(Parcel in) {
+        complaintNo = in.readString();
+        userId = in.readString();
+        schoolName = in.readString();
+        description = in.readString();
+        date = in.readString();
+        problems = in.readString();
+        imageLink = in.readString();
+        phoneNumber = in.readString();
+        emailId = in.readString();
+        status = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(complaintNo);
+        parcel.writeString(userId);
+        parcel.writeString(schoolName);
+        parcel.writeString(date);
+        parcel.writeString(problems);
+        parcel.writeString(imageLink);
+        parcel.writeString(phoneNumber);
+        parcel.writeString(emailId);
+        parcel.writeString(status);
     }
 
     public String getComplaintNo() {
@@ -102,4 +143,11 @@ public class Complaint {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
 }

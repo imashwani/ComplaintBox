@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,12 +16,12 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
+    FragmentManager fragmentManager;
     FragmentTransaction transaction;
 
     int RC_SIGN_IN = 1;
     private String mUsername = null;
     private String mUseremail = null;
-    private TextView tv;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fragmentManager = getSupportFragmentManager();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationBar);
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(
                             com.firebase.ui.auth.AuthUI.getInstance()
                                     .createSignInIntentBuilder()
+                                    .setLogo(R.drawable.add_page)
                                     .setIsSmartLockEnabled(false)
                                     .setAvailableProviders(
                                             Arrays.asList(new com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder().build(),
@@ -60,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        if (savedInstanceState == null) {
+            showHomeFragment();
+        }
 
-        showHomeFragment();
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -103,23 +108,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openSettingsFragment() {
-        transaction = getSupportFragmentManager().beginTransaction();
+        transaction = fragmentManager.beginTransaction();
         SettingsFragment fragment = new SettingsFragment();
         transaction.replace(R.id.frame_layout, fragment);
+//        transaction.addToBackStack(null);
         transaction.commit();
     }
 
     private void showComplaintListFragment() {
-        transaction = getSupportFragmentManager().beginTransaction();
+        transaction = fragmentManager.beginTransaction();
         ComplaintRVListFragment fragment = new ComplaintRVListFragment();
         transaction.replace(R.id.frame_layout, fragment);
+//        transaction.addToBackStack(null);
         transaction.commit();
     }
 
     private void showHomeFragment() {
-        transaction = getSupportFragmentManager().beginTransaction();
+        transaction = fragmentManager.beginTransaction();
         HomeFragment Hfragment = new HomeFragment();
         transaction.replace(R.id.frame_layout, Hfragment);
+//        transaction.addToBackStack(null);
         transaction.commit();
     }
 
