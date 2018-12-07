@@ -2,9 +2,11 @@ package com.example.ashwani.complaintbox;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -30,17 +32,24 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,9 +59,10 @@ import static android.content.ContentValues.TAG;
 
 public class RegisterComplaintFragment extends Fragment {
 
+    Thread thread;
     int CAMERA_PERMISSION_REQUEST_CODE = 4192;
     Button camera, gallery;
-    String mCurrentPhotoPath;
+    String mCurrentPhotoPath, fireId;
     Bitmap bitmap;
     FirebaseDatabase database;
     DatabaseReference myReff;
@@ -65,6 +75,28 @@ public class RegisterComplaintFragment extends Fragment {
     private Spinner spinner;
     private ImageButton mImageAddButton;
     private FirebaseAuth mFirebaseAuth;
+
+    public static String getPath(Context context, Uri uri) {
+        String result = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int column_index = cursor.getColumnIndexOrThrow(proj[0]);
+                result = cursor.getString(column_index);
+            }
+            cursor.close();
+        }
+        if (result == null) {
+            result = "Not found";
+        }
+        return result;
+    }
+
+    private void registerComplaint() {
+        getComplaintDetails();
+        getComplaintNumber();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,6 +127,67 @@ public class RegisterComplaintFragment extends Fragment {
                 registerComplaint();
 
                 if (mCurrentPhotoPath != null && mCurrentPhotoPath.length() > 0) {
+                    thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            OutputStream file = null;
+                            Log.d(TAG, "run: Thread startedDDD");
+                            File imageFile = new File(mCurrentPhotoPath);
+                            if (imageFile.exists()) {
+                                Log.d(TAG, "run: Image file EXISTS");
+                                //decoding the selected file
+                                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                                Bitmap bp = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+                                try {
+                                    file = new FileOutputStream(new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "imageOf" + complaintNo + ".webp"));
+
+                                    if (file != null) {
+                                        bp.compress(Bitmap.CompressFormat.WEBP, 50, file);
+                                        file.close();
+                                    }
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                Log.d(TAG, "run:Image file isn't were the path says");
+                            }
+
+                            //uploading the file to  FirebaseStorage
+                            // Create a storage reference from our app
+
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+                            // Create a reference to "image.jpg"
+                            StorageReference mountainsRef = storageRef.child("images/" + complaintNo + ".jpg");
+
+
+                            final UploadTask uploadTask = mountainsRef.putFile(Uri.fromFile(new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "imageOf" + complaintNo + ".webp")));
+
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                                    // ...
+
+                                    String downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                                    Log.d(TAG, "onSuccess: File Uploaded succesfully" + downloadUrl);
+                                    Toast.makeText(rootView.getContext(), "image uploaded" + downloadUrl, Toast.LENGTH_LONG);
+
+                                    //pushing complaint details to the database
+                                    myReff.child(mFirebaseAuth.getCurrentUser().getUid()).child(fireId).child("imageLink").setValue(downloadUrl);
+
+                                }
+                            });
+                        }
+                    });
 
                 }
 
@@ -147,37 +240,6 @@ public class RegisterComplaintFragment extends Fragment {
         return rootView;
     }
 
-    private void registerComplaint() {
-        getComplaintDetails();
-        getComplaintNumber();
-    }
-
-    //getComplaintNumber will also register the complaint to data base
-    private void getComplaintNumber() {
-        final DatabaseReference complaintReff = database.getReference("complaintNo");
-        complaintReff.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: " + dataSnapshot);
-                complaintNo = dataSnapshot.getValue().toString();
-                complaintReff.setValue(Integer.valueOf(complaintNo) + 1);
-
-                Log.d(TAG, "onDataChange: The complaint number is" + complaintNo);
-
-                Complaint complaint = new Complaint(complaintNo, userId, schoolName, description, date, problems, imageLink, phoneNumber, emailId, status);
-                //Adding complaint to the database
-                myReff.child(userId).push().setValue(complaint);
-                Toast.makeText(rootView.getContext(), "Complaint No " + complaintNo + " Registered", Toast.LENGTH_LONG);
-                getActivity().getFragmentManager().popBackStack();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
 
     private void getComplaintDetails() {
         userId = mFirebaseAuth.getCurrentUser().getUid();
@@ -212,6 +274,36 @@ public class RegisterComplaintFragment extends Fragment {
         return mFirebaseAuth.getCurrentUser().getUid();
     }
 
+    //getComplaintNumber will also register the complaint to data base
+    private void getComplaintNumber() {
+        final DatabaseReference complaintReff = database.getReference("complaintNo");
+        complaintReff.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: " + dataSnapshot);
+                complaintNo = dataSnapshot.getValue().toString();
+                complaintReff.setValue(Integer.valueOf(complaintNo) + 1);
+
+                Log.d(TAG, "onDataChange: The complaint number is" + complaintNo);
+
+                Complaint complaint = new Complaint(complaintNo, userId, schoolName, description, date, problems, imageLink, phoneNumber, emailId, status);
+                //Adding complaint to the database
+                fireId = myReff.child(userId).push().getKey();
+                myReff.child(userId).child(fireId).setValue(complaint);
+                Toast.makeText(rootView.getContext(), "Complaint No " + complaintNo + " Registered", Toast.LENGTH_LONG);
+                getActivity().getFragmentManager().popBackStack();
+                if (thread != null) {
+                    thread.start();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -232,7 +324,7 @@ public class RegisterComplaintFragment extends Fragment {
 
                 // the address of the image on the SD Card.
                 Uri imageUri = data.getData();
-                mCurrentPhotoPath = imageUri.getPath();
+                mCurrentPhotoPath = getPath(getActivity().getApplicationContext(), imageUri);
 
                 Log.d(TAG, "onActivityResult: galley image current Path " + mCurrentPhotoPath);
 
