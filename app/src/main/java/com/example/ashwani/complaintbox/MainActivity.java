@@ -7,6 +7,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager;
     FragmentTransaction transaction;
+    String TAG = "MainActivity";
 
     int RC_SIGN_IN = 1;
     private String mUsername = null;
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Toast.makeText(MainActivity.this, "You are logged in friend", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onAuthStateChanged: You are logged in friend");
                     mUsername = user.getDisplayName();
                     mUseremail = user.getEmail();
                     setUserdata();
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.settings:
-                        Toast.makeText(MainActivity.this, "settigns", Toast.LENGTH_SHORT).show();
                         openSettingsFragment();
                         break;
                     case R.id.home:
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Toast.makeText(MainActivity.this, "shigned in bro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "signed in bro", Toast.LENGTH_SHORT).show();
                 // ...
             } else {
                 // Sign in failed, check response for error code

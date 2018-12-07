@@ -5,7 +5,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -33,10 +36,18 @@ public class ComplaintAdapter extends RecyclerView.Adapter<ComplaintAdapter.Comp
     @Override
     public void onBindViewHolder(ComplaintViewHolder holder, int position) {
         //setting data to each complaint view
-        holder.tvComplaintNo.setText(ComplaintList.get(position).getComplaintNo());
-        holder.tvSchoolName.setText(ComplaintList.get(position).getSchoolName());
-        holder.tvProblem.setText(ComplaintList.get(position).getProblems());
-        holder.tvDate.setText(ComplaintList.get(position).getDate());
+        Complaint complaint = ComplaintList.get(position);
+
+        holder.tvComplaintNo.setText(complaint.getComplaintNo());
+        holder.tvSchoolName.setText(complaint.getSchoolName());
+        holder.tvProblem.setText(complaint.getProblems());
+        holder.tvDate.setText(complaint.getDate());
+        holder.extraText.setText(complaint.getDescription());
+
+        if (complaint.getImageLink().length() > 2) {
+
+            Glide.with(context).load(complaint.getImageLink()).into(holder.imageView);
+        }
     }
 
     @Override
@@ -45,7 +56,8 @@ public class ComplaintAdapter extends RecyclerView.Adapter<ComplaintAdapter.Comp
     }
 
     public class ComplaintViewHolder extends RecyclerView.ViewHolder {
-        TextView tvComplaintNo, tvSchoolName, tvProblem, tvDate;
+        TextView tvComplaintNo, tvSchoolName, tvProblem, tvDate, extraText;
+        ImageView imageView;
 
         public ComplaintViewHolder(View itemView) {
             super(itemView);
@@ -53,6 +65,8 @@ public class ComplaintAdapter extends RecyclerView.Adapter<ComplaintAdapter.Comp
             tvSchoolName = itemView.findViewById(R.id.school_name_tv);
             tvProblem = itemView.findViewById(R.id.problem_tv);
             tvDate = itemView.findViewById(R.id.date_tv);
+            extraText = itemView.findViewById(R.id.extra_text);
+            imageView = itemView.findViewById(R.id.school_icon_imgview);
         }
 
     }

@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -253,17 +254,24 @@ public class RegisterComplaintFragment extends Fragment {
         date = dateFormat.format(date_);
 
         StringBuilder stringBuilder = new StringBuilder();
-        if (rootView.findViewById(R.id.CPU_CB).isEnabled()) {
+        CheckBox cpu_cb = rootView.findViewById(R.id.CPU_CB);
+        CheckBox projector_cb = rootView.findViewById(R.id.projector_CB);
+        CheckBox sound_cb = rootView.findViewById(R.id.sound_CB);
+        CheckBox wiring_cb = rootView.findViewById(R.id.wiring_CB);
+        CheckBox os_cb = rootView.findViewById(R.id.os_CB);
+        CheckBox others_cb = rootView.findViewById(R.id.others_CB);
+
+        if (cpu_cb.isChecked())
             stringBuilder.append("CPU, ");
-        }
-        if (rootView.findViewById(R.id.projector_CB).isEnabled())
+        if (projector_cb.isChecked())
             stringBuilder.append("Projector, ");
-        if (rootView.findViewById(R.id.sound_CB).isEnabled())
+        if (sound_cb.isChecked())
             stringBuilder.append("Sound, ");
-        if (rootView.findViewById(R.id.wiring_CB).isEnabled())
+        if (wiring_cb.isChecked())
             stringBuilder.append("Wiring, ");
-        if (rootView.findViewById(R.id.os_CB).isEnabled())
+        if (os_cb.isChecked())
             stringBuilder.append("Operating System/Windows, ");
+
         problems = stringBuilder.substring(0, stringBuilder.length() - 2);
 
         emailId = mFirebaseAuth.getCurrentUser().getEmail();
