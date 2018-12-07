@@ -31,13 +31,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -67,13 +71,13 @@ public class RegisterComplaintFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_register_complaint, container, false);
-//        database = FirebaseDatabase.getInstance();
-//        myReff = database.getReference("complaint");
+        database = FirebaseDatabase.getInstance();
+        myReff = database.getReference("complaint");
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
 
-        spinner = (Spinner) rootView.findViewById(R.id.school_spinner);
+        spinner = rootView.findViewById(R.id.school_spinner);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.Schools, android.R.layout.simple_spinner_item);
@@ -88,21 +92,15 @@ public class RegisterComplaintFragment extends Fragment {
         sendComplaint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getComplaintDetails();
-                Complaint theComplaint = new Complaint(complaintNo, userId, schoolName, description, date, problems, imageLink, phoneNumber, emailId, status);
-                //pushing complaint details to the database
-//                myReff.child(getUserId()).push().setValue(theComplaint);
-                Intent registerComplaintServiceIntent = new Intent();
-                registerComplaintServiceIntent.setClass(getContext(), RegisterComplaintService.class);
+                registerComplaint();
 
-                registerComplaintServiceIntent.putExtra("complaint", theComplaint);
-                if (mCurrentPhotoPath.length() > 0) {
-                    registerComplaintServiceIntent.putExtra("filePath", mCurrentPhotoPath);
+                if (mCurrentPhotoPath != null && mCurrentPhotoPath.length() > 0) {
+
                 }
 
-                getContext().startService(registerComplaintServiceIntent);
             }
         });
+
         mImageAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,6 +147,67 @@ public class RegisterComplaintFragment extends Fragment {
         return rootView;
     }
 
+    private void registerComplaint() {
+        getComplaintDetails();
+        getComplaintNumber();
+    }
+
+    //getComplaintNumber will also register the complaint to data base
+    private void getComplaintNumber() {
+        final DatabaseReference complaintReff = database.getReference("complaintNo");
+        complaintReff.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: " + dataSnapshot);
+                complaintNo = dataSnapshot.getValue().toString();
+                complaintReff.setValue(Integer.valueOf(complaintNo) + 1);
+
+                Log.d(TAG, "onDataChange: The complaint number is" + complaintNo);
+
+                Complaint complaint = new Complaint(complaintNo, userId, schoolName, description, date, problems, imageLink, phoneNumber, emailId, status);
+                //Adding complaint to the database
+                myReff.child(userId).push().setValue(complaint);
+                Toast.makeText(rootView.getContext(), "Complaint No " + complaintNo + " Registered", Toast.LENGTH_LONG);
+                getActivity().getFragmentManager().popBackStack();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+    private void getComplaintDetails() {
+        userId = mFirebaseAuth.getCurrentUser().getUid();
+
+        schoolName = spinner.getSelectedItem().toString();
+        EditText editText = rootView.findViewById(R.id.descriptionOfComplaint);
+
+        description = (editText).getText().toString();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date_ = new Date();
+        date = dateFormat.format(date_);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        if (rootView.findViewById(R.id.CPU_CB).isEnabled()) {
+            stringBuilder.append("CPU, ");
+        }
+        if (rootView.findViewById(R.id.projector_CB).isEnabled())
+            stringBuilder.append("Projector, ");
+        if (rootView.findViewById(R.id.sound_CB).isEnabled())
+            stringBuilder.append("Sound, ");
+        if (rootView.findViewById(R.id.wiring_CB).isEnabled())
+            stringBuilder.append("Wiring, ");
+        if (rootView.findViewById(R.id.os_CB).isEnabled())
+            stringBuilder.append("Operating System/Windows, ");
+        problems = stringBuilder.substring(0, stringBuilder.length() - 2);
+
+        emailId = mFirebaseAuth.getCurrentUser().getEmail();
+
+    }
+
     private String getUserId() {
         return mFirebaseAuth.getCurrentUser().getUid();
     }
@@ -173,7 +232,7 @@ public class RegisterComplaintFragment extends Fragment {
 
                 // the address of the image on the SD Card.
                 Uri imageUri = data.getData();
-                mCurrentPhotoPath = imageUri.getPath().toString();
+                mCurrentPhotoPath = imageUri.getPath();
 
                 Log.d(TAG, "onActivityResult: galley image current Path " + mCurrentPhotoPath);
 
@@ -279,25 +338,6 @@ public class RegisterComplaintFragment extends Fragment {
         return image;
     }
 
-    private void getComplaintDetails() {
-        schoolName = spinner.getSelectedItem().toString();
-        StringBuilder stringBuilder = new StringBuilder("");
-        if (rootView.findViewById(R.id.CPU_CB).isEnabled()) {
-            stringBuilder.append("CPU, ");
-        }
-        if (rootView.findViewById(R.id.projector_CB).isEnabled())
-            stringBuilder.append("Projector, ");
-        if (rootView.findViewById(R.id.sound_CB).isEnabled())
-            stringBuilder.append("Sound, ");
-        if (rootView.findViewById(R.id.wiring_CB).isEnabled())
-            stringBuilder.append("Wiring, ");
-        if (rootView.findViewById(R.id.os_CB).isEnabled())
-            stringBuilder.append("Operating System/Windows, ");
-        problems = stringBuilder.substring(0, stringBuilder.length() - 2);
-        EditText editText = rootView.findViewById(R.id.descriptionOfComplaint);
-        description = (editText).getText().toString();
-        emailId = mFirebaseAuth.getCurrentUser().getEmail();
-    }
 
 //    private class CompressFilesTask extends AsyncTask<String, Void, String> {
 //

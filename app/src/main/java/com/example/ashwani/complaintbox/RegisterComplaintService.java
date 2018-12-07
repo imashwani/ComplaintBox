@@ -100,7 +100,7 @@ public class RegisterComplaintService extends IntentService {
 
         FirebaseDatabase database;
         DatabaseReference myReff;
-        //register the complain tot firebase databse
+        //register the complain to firebase databse
         database = FirebaseDatabase.getInstance();
         myReff = database.getReference("complaint");
 
