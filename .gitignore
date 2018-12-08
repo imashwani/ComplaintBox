@@ -119,7 +119,7 @@ gen-external-apklibs
 # Android Patch
 
 # External native build folder generated in Android Studio 2.2 and later
-
+*.iml
 # NDK
 obj/
 
@@ -128,6 +128,7 @@ obj/
 /out/
 
 # User-specific configurations
+.idea
 .idea/caches/
 .idea/libraries/
 .idea/shelf/
