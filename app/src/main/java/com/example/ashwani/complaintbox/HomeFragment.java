@@ -1,8 +1,6 @@
 package com.example.ashwani.complaintbox;
 
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,6 +8,7 @@ import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -71,12 +70,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void openPlayStore() {
-        final String appPackageName = getActivity().getPackageName(); // getPackageName() from Context or Activity object
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-        } catch (android.content.ActivityNotFoundException anfe) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-        }
+        Toast.makeText(getActivity().getBaseContext(), "Not yet", Toast.LENGTH_SHORT);
+        return;
+//        final String appPackageName = getActivity().getPackageName(); // getPackageName() from Context or Activity object
+//        try {
+//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+//        } catch (android.content.ActivityNotFoundException anfe) {
+//            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+//        }
     }
 
     private void addNewComplaintFragment() {
@@ -94,14 +95,13 @@ public class HomeFragment extends Fragment {
         transaction.commit();
     }
 
-
 }
-
 
 /*        bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cp = new Complaint("002", "sds5s", "shakar dk", "desp", "12/12/17", "cpu ka problem", "link ka img", "9911416637", "mail@gmail.com", "true");
+                cp = new Complaint("002", "sds5s", "shakar dk", "desp",
+                 "12/12/17", "cpu ka problem", "link ka img", "9911416637", "mail@gmail.com", "true");
                 myReff.push().setValue(cp);
 
                 addNewComplaintFragment();

@@ -72,7 +72,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:background="@drawable/circle_gray"
-                android:padding="10dp"
+                android:padding="8dp"
                 android:src="@drawable/add_page" />
 
             <TextView
@@ -159,8 +159,9 @@
                 style="@style/image_home"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
+                android:padding="8dp"
                 android:background="@drawable/circle_gray"
-                android:src="@drawable/feedback_icon" />
+                android:src="@drawable/ic_rate_review_black_24dp" />
 
             <TextView
                 android:layout_width="wrap_content"

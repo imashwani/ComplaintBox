@@ -7,7 +7,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -41,13 +40,15 @@ public class MainActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.d(TAG, "onAuthStateChanged: You are logged in friend");
+                    //user is logged in
+//                    Log.d(TAG, "onAuthStateChanged: You are logged in friend");
                     mUsername = user.getDisplayName();
                     mUseremail = user.getEmail();
                     setUserdata();
                     android.util.Log.d("", "onAuthStateChanged: CCIN Email:" + mUseremail + "name: " + mUsername);
 
-                } else {//user signed out
+                } else {
+                    //user signed out
                     startActivityForResult(
                             com.firebase.ui.auth.AuthUI.getInstance()
                                     .createSignInIntentBuilder()
